@@ -1,0 +1,172 @@
+{
+  "_comment": "Rules for tv-filter (same format as tools/tv_block_rules.json). Edit and save; changes apply on the next request. 'enabled': false keeps a rule around without using it. 'log' rules append full requests/responses to log.file (relative to this file) as JSONL.",
+  "log": { "file": "flows.jsonl", "max_body": 2000000 },
+  "rules": [
+    {
+      "name": "log-all",
+      "enabled": false,
+      "host": ".",
+      "action": "log"
+    },
+    {
+      "name": "samsung-ads-config-off",
+      "enabled": true,
+      "host": "^config\\.samsungads\\.com$",
+      "path": "^/CombinedAds/",
+      "action": "replace",
+      "replace": [
+        ["\"enableAd\"\\s*:\\s*\"on\"", "\"enableAd\":\"off\""],
+        ["\"realTimeAd\"\\s*:\\s*\"on\"", "\"realTimeAd\":\"off\""]
+      ]
+    },
+    {
+      "name": "samsung-tvplus-ads-config-off",
+      "enabled": true,
+      "host": "^rtb-config\\.samsungads\\.com$",
+      "action": "replace",
+      "replace": [["\"enabled\"\\s*:\\s*\"on\"", "\"enabled\":\"off\""]]
+    },
+    {
+      "name": "samsung-ads-banner",
+      "enabled": true,
+      "host": "^(tvx|rtb|catalyst)\\.adgrx\\.com$",
+      "action": "block",
+      "status": 200,
+      "content_type": "application/json",
+      "body": "{}"
+    },
+    {
+      "name": "samsung-ads-images",
+      "enabled": true,
+      "host": "^cdn-stv\\.adgrx\\.com$",
+      "action": "block",
+      "status": 404
+    },
+    {
+      "name": "samsung-ads-logs",
+      "enabled": true,
+      "host": "^tvp-ads-log\\.samsungads\\.com$|^samsungads\\.adsmeasurement\\.com$",
+      "action": "block",
+      "status": 204
+    },
+    {
+      "name": "firmware-no-update",
+      "enabled": true,
+      "host": "^osb-v2\\.samsungqbe\\.com$",
+      "path": "^/otn/openapi/v2/notice/(auto|manual)",
+      "action": "block",
+      "status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "body": "{\"rsp\":{\"stat\":\"ok\",\"modelId\":\"T-PTMAKUC\",\"latestFirmwareExist\":false},\"lastUpdateTime\":\"2026-10-24T00:32:17.5279861Z\"}"
+    },
+    {
+      "name": "home-empty",
+      "enabled": true,
+      "host": "^osb-v2\\.samsungqbe\\.com$",
+      "path": "^/terra/service/v3/home",
+      "action": "block",
+      "status": 200,
+      "content_type": "application/json",
+      "body": {
+        "rsp": {
+          "stat": "ok",
+          "resources": {},
+          "payload": {
+            "page_id": "20124",
+            "updatetoken": "20124_1792930000_1792812029",
+            "groups": [],
+            "config_detail": {
+              "config_required": false,
+              "cp_preference": true,
+              "splash_screen": { "video_url": "", "show_count": 0 },
+              "list_of_apps": [],
+              "targetGroupTag": "",
+              "continue_watching_test": false,
+              "continue_watching_apps": [],
+              "chmaphash": "77AA3E56",
+              "tabs": [
+                { "tab_id": 16, "tab_order": 2, "tab_name": "Live", "tab_type": "Live", "tab_tag": "Live" },
+                { "tab_id": 17, "tab_order": 1, "tab_name": "For You", "tab_type": "ForYou", "tab_tag": "ForYou" }
+              ],
+              "continue_watching_max_content_count_by_cp": { "game": 0, "music": 0, "video": 0 },
+              "continue_watching_max_content_count": { "game": 0, "music": 0, "video": 0 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "home-rows",
+      "enabled": false,
+      "host": "^osb-v2\\.samsungqbe\\.com$",
+      "path": "^/terra/service/v3/home",
+      "action": "filter_groups",
+      "groups_path": "rsp.payload.groups",
+      "match_key": "group_tag",
+      "keep": "^(continue_watching|watch_later|\\[foryou\\]\\[curated\\]_top_picks_for_you)$",
+      "max_items": 1,
+      "max_items_match": "top_picks"
+    },
+    {
+      "name": "gaming-hub-home",
+      "enabled": true,
+      "host": "^osb-v2\\.samsungqbe\\.com$",
+      "path": "^/ghs/v1/home",
+      "action": "block",
+      "status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "body": {
+        "rsp": {
+          "stat": "ok",
+          "layout_id": 5523,
+          "cachekey": "887f4dfee65e07d77d07e81d3006c92545ba8b11",
+          "rows": [],
+          "tutorials": [],
+          "apps_placement": { "apps_placement_id": 133, "items": [], "item_count": 0 },
+          "immersive_mhb": {},
+          "quick_panel": []
+        }
+      }
+    },
+    {
+      "name": "gaming-hub-live-video",
+      "enabled": true,
+      "host": "^osb-v2\\.samsungqbe\\.com$",
+      "path": "^/ghs/v1/live/video",
+      "action": "block",
+      "status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "body": { "rsp": { "stat": "ok", "live_videos": [] } }
+    },
+    {
+      "name": "hulu-adobe-heartbeat",
+      "enabled": false,
+      "host": "\\.omtrdc\\.net$",
+      "action": "block",
+      "status": 204
+    },
+    {
+      "name": "conviva",
+      "enabled": false,
+      "host": "\\.conviva\\.com$",
+      "action": "block",
+      "status": 204
+    },
+    {
+      "name": "nielsen",
+      "enabled": false,
+      "host": "\\.imrworldwide\\.com$",
+      "action": "block",
+      "status": 204
+    },
+    {
+      "name": "samsung-telemetry",
+      "enabled": true,
+      "host": "^lcprd1\\.samsungcloudsolution\\.net$",
+      "action": "block",
+      "status": 200,
+      "content_type": "text/xml",
+      "body": ""
+    }
+  ]
+}

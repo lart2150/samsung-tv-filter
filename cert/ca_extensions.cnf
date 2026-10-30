@@ -1,0 +1,14 @@
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = *.samsungads.com
+DNS.2 = *.adgrx.com
+DNS.3 = *.adsmeasurement.com
+DNS.4 = *.samsungqbe.com
+DNS.5 = *.omtrdc.net
+DNS.6 = *.conviva.com
+DNS.7 = *.imrworldwide.com
+DNS.8 = *.samsungcloudsolution.net

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://www.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node24/tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "nodenext",
+    "rootDir": "src",
+    "outDir": "dist",
+    "noUncheckedIndexedAccess": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+    "sourceMap": true
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}
